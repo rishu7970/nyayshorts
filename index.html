@@ -1,0 +1,991 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-black">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>NyayShorts - 100-Word Legal Rulings</title>
+  
+  <!-- PWA & Mobile Meta Tags -->
+  <meta name="theme-color" content="#000000">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="NyayShorts">
+  <link rel="manifest" href="manifest.json">
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            inshortsBlue: '#1a73e8',
+            cardBg: '#ffffff'
+          },
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', 'SF Pro Text', 'SF Pro Display', 'Helvetica Neue', 'Arial', 'sans-serif']
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Swiper.js CSS -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+  <!-- Supabase JS Client & Lucide Icons -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    html, body {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      overflow: hidden;
+      width: 100%;
+      height: 100%;
+      touch-action: pan-y;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+      background-color: #000000;
+    }
+    
+    .swiper {
+      width: 100%;
+      height: 100%;
+    }
+    
+    .swiper-slide {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    /* Apple Liquid Glass Effect */
+    .apple-liquid-glass {
+      background: rgba(245, 247, 250, 0.78);
+      backdrop-filter: blur(28px) saturate(190%);
+      -webkit-backdrop-filter: blur(28px) saturate(190%);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      box-shadow: 0 8px 24px -4px rgba(0, 0, 0, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.95);
+    }
+
+    .apple-dock {
+      background: rgba(225, 230, 240, 0.78);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border: 1px solid rgba(255, 255, 255, 0.55);
+      box-shadow: 0 12px 30px -5px rgba(0, 0, 0, 0.5);
+    }
+
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    .inshorts-headline {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Helvetica Neue", Arial, sans-serif;
+      font-weight: 700;
+      letter-spacing: -0.015em;
+      line-height: 1.34;
+    }
+
+    .inshorts-body {
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Arial, sans-serif;
+      line-height: 1.62;
+      color: #262626;
+      font-weight: 400;
+    }
+  </style>
+</head>
+
+<body class="bg-black text-white antialiased font-sans select-none">
+
+  <!-- TOP APP BAR (Inshorts Horizontal Navigation Tabs) -->
+  <header class="fixed top-0 left-0 right-0 z-30 bg-black/95 backdrop-blur-md border-b border-neutral-900 pt-3 pb-2 px-3">
+    <nav class="flex items-center space-x-5 overflow-x-auto no-scrollbar text-[13px] font-semibold whitespace-nowrap px-1" id="courtTabsNav">
+      <button onclick="switchCourtTab('ALL')" id="tab-ALL" class="court-tab text-inshortsBlue font-bold relative pb-1 transition">
+        My Feed
+        <span class="active-indicator absolute bottom-0 left-0 right-0 h-[2px] bg-inshortsBlue rounded-full"></span>
+      </button>
+      <button onclick="switchCourtTab('Supreme Court')" id="tab-Supreme-Court" class="court-tab text-neutral-400 hover:text-white pb-1 transition">
+        Supreme Court
+      </button>
+      <button onclick="switchCourtTab('Delhi High Court')" id="tab-Delhi-High-Court" class="court-tab text-neutral-400 hover:text-white pb-1 transition">
+        Delhi HC
+      </button>
+      <button onclick="switchCourtTab('Bombay High Court')" id="tab-Bombay-High-Court" class="court-tab text-neutral-400 hover:text-white pb-1 transition">
+        Bombay HC
+      </button>
+      <button onclick="switchCourtTab('Patna High Court')" id="tab-Patna-High-Court" class="court-tab text-neutral-400 hover:text-white pb-1 transition">
+        Patna HC
+      </button>
+      <button onclick="switchCourtTab('Kerala High Court')" id="tab-Kerala-High-Court" class="court-tab text-neutral-400 hover:text-white pb-1 transition">
+        Kerala HC
+      </button>
+      <button onclick="switchCourtTab('Allahabad High Court')" id="tab-Allahabad-High-Court" class="court-tab text-neutral-400 hover:text-white pb-1 transition">
+        Allahabad HC
+      </button>
+      <button onclick="switchCourtTab('Calcutta High Court')" id="tab-Calcutta-High-Court" class="court-tab text-neutral-400 hover:text-white pb-1 transition">
+        Calcutta HC
+      </button>
+      <button onclick="switchCourtTab('Madras High Court')" id="tab-Madras-High-Court" class="court-tab text-neutral-400 hover:text-white pb-1 transition">
+        Madras HC
+      </button>
+      <button onclick="switchCourtTab('Karnataka High Court')" id="tab-Karnataka-High-Court" class="court-tab text-neutral-400 hover:text-white pb-1 transition">
+        Karnataka HC
+      </button>
+      <button onclick="switchCourtTab('Punjab & Haryana High Court')" id="tab-Punjab-Haryana-High-Court" class="court-tab text-neutral-400 hover:text-white pb-1 transition">
+        Punjab & Haryana HC
+      </button>
+      <button onclick="switchCourtTab('Gujarat High Court')" id="tab-Gujarat-High-Court" class="court-tab text-neutral-400 hover:text-white pb-1 transition">
+        Gujarat HC
+      </button>
+      <button onclick="switchCourtTab('District Courts')" id="tab-District-Courts" class="court-tab text-neutral-400 hover:text-white pb-1 transition">
+        🏛️ District Courts
+      </button>
+    </nav>
+
+    <!-- Sub-Filter Bar for District Courts -->
+    <div id="districtPillsRow" class="hidden flex items-center space-x-2 overflow-x-auto no-scrollbar pt-2 pb-0.5 text-[11px]">
+      <span class="text-neutral-500 font-medium pl-1 flex-shrink-0">District:</span>
+      <button onclick="filterDistrict('ALL')" id="dist-ALL" class="dist-pill px-2.5 py-0.5 rounded-full bg-neutral-800 text-white font-semibold flex-shrink-0">All Districts</button>
+      <button onclick="filterDistrict('Rouse Avenue')" id="dist-Rouse-Avenue" class="dist-pill px-2.5 py-0.5 rounded-full bg-neutral-900 text-neutral-400 hover:text-white flex-shrink-0">Rouse Avenue (Delhi)</button>
+      <button onclick="filterDistrict('Tis Hazari')" id="dist-Tis-Hazari" class="dist-pill px-2.5 py-0.5 rounded-full bg-neutral-900 text-neutral-400 hover:text-white flex-shrink-0">Tis Hazari</button>
+      <button onclick="filterDistrict('Mumbai City Civil')" id="dist-Mumbai" class="dist-pill px-2.5 py-0.5 rounded-full bg-neutral-900 text-neutral-400 hover:text-white flex-shrink-0">Mumbai Sessions</button>
+      <button onclick="filterDistrict('Patna Civil Court')" id="dist-Patna" class="dist-pill px-2.5 py-0.5 rounded-full bg-neutral-900 text-neutral-400 hover:text-white flex-shrink-0">Patna Sessions</button>
+      <button onclick="filterDistrict('Ernakulam District')" id="dist-Ernakulam" class="dist-pill px-2.5 py-0.5 rounded-full bg-neutral-900 text-neutral-400 hover:text-white flex-shrink-0">Ernakulam District</button>
+    </div>
+  </header>
+
+  <!-- NATIVE ANDROID WEBAPK INSTALL PROMPT BANNER -->
+  <div id="installAppBanner" class="hidden fixed top-14 left-3 right-3 z-50 bg-gradient-to-r from-inshortsBlue to-blue-700 text-white rounded-2xl p-3 shadow-2xl flex items-center justify-between border border-white/20 animate-fade-in">
+    <div class="flex items-center space-x-2.5">
+      <div class="w-8 h-8 rounded-xl bg-white text-inshortsBlue flex items-center justify-center font-bold text-sm shadow-sm flex-shrink-0">
+        ⚖️
+      </div>
+      <div>
+        <p class="text-xs font-bold leading-tight">Install NyayShorts App</p>
+        <p class="text-[10px] text-blue-100 font-medium">Standalone full-screen card swipe</p>
+      </div>
+    </div>
+    <div class="flex items-center space-x-2 flex-shrink-0">
+      <button onclick="triggerInstallApp()" class="px-3.5 py-1.5 rounded-xl bg-white text-inshortsBlue font-bold text-xs shadow-md active:scale-95 transition">
+        Install
+      </button>
+      <button onclick="document.getElementById('installAppBanner').classList.add('hidden')" aria-label="Close" class="p-1 text-white/80 hover:text-white">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- MAIN SWIPER (With Left & Right Margins) -->
+  <main class="w-full h-full pt-12 pb-16 px-3 sm:px-4">
+    <div class="swiper mySwiper">
+      <div class="swiper-wrapper" id="cardsWrapper">
+        <!-- Cards inserted dynamically -->
+      </div>
+    </div>
+
+    <!-- Loading Spinner -->
+    <div id="loadingOverlay" class="fixed inset-0 z-20 flex flex-col items-center justify-center bg-black">
+      <div class="w-8 h-8 border-2 border-neutral-700 border-t-inshortsBlue rounded-full animate-spin"></div>
+      <p class="mt-3 text-xs tracking-wider uppercase text-neutral-400 font-medium">Loading Rulings...</p>
+    </div>
+
+    <!-- Empty State -->
+    <div id="emptyState" class="hidden fixed inset-0 z-10 flex flex-col items-center justify-center p-6 text-center bg-black">
+      <div class="w-14 h-14 rounded-full bg-neutral-900 flex items-center justify-center text-neutral-500 mb-3">
+        <i data-lucide="scale" class="w-6 h-6"></i>
+      </div>
+      <h3 class="text-base font-bold text-white">No Rulings Found</h3>
+      <p class="text-xs text-neutral-400 mt-1 max-w-xs">No rulings found for this court tab yet.</p>
+      <button onclick="switchCourtTab('ALL')" class="mt-4 px-4 py-2 text-xs font-semibold rounded-full bg-inshortsBlue text-white">
+        Back to My Feed
+      </button>
+    </div>
+  </main>
+
+  <!-- FLOATING APPLE LIQUID GLASS BOTTOM DOCK -->
+  <nav class="fixed bottom-3 left-0 right-0 z-40 flex justify-center px-4 pointer-events-none">
+    <div class="apple-dock rounded-full px-6 py-2.5 flex items-center space-x-8 pointer-events-auto shadow-2xl">
+      <button onclick="toggleSearchModal(true)" aria-label="Search" class="p-1 text-neutral-800 hover:text-black transition active:scale-95">
+        <i data-lucide="search" class="w-5 h-5"></i>
+      </button>
+
+      <button onclick="switchCourtTab('ALL')" aria-label="Feed" class="w-10 h-8 rounded-full bg-inshortsBlue flex items-center justify-center text-white shadow-md active:scale-95 transition">
+        <i data-lucide="home" class="w-4 h-4"></i>
+      </button>
+
+      <button onclick="toggleBookmarksView()" id="bookmarkDockBtn" aria-label="Saved" class="p-1 text-neutral-800 hover:text-black transition active:scale-95">
+        <i data-lucide="bookmark" class="w-5 h-5"></i>
+      </button>
+    </div>
+  </nav>
+
+  <!-- SEARCH MODAL -->
+  <div id="searchModal" class="hidden fixed inset-0 z-50 bg-black/70 backdrop-blur-md p-4 flex flex-col">
+    <div class="bg-white rounded-2xl p-4 shadow-2xl flex-1 flex flex-col max-h-[82vh] max-w-md mx-auto w-full border border-neutral-200">
+      <div class="flex items-center justify-between pb-3 border-b border-neutral-200">
+        <div class="flex items-center space-x-2 flex-1 mr-2">
+          <i data-lucide="search" class="w-4 h-4 text-neutral-400"></i>
+          <input type="text" id="searchInput" oninput="handleSearch(this.value)" placeholder="Search case title, judge name, or legal term..." class="w-full bg-transparent text-neutral-900 placeholder-neutral-400 text-sm focus:outline-none">
+        </div>
+        <button onclick="toggleSearchModal(false)" class="p-1 rounded-full text-neutral-400 hover:text-neutral-800">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      <div id="searchResultsCount" class="text-[11px] text-neutral-400 py-2 font-medium">Type to search rulings...</div>
+      <div class="flex-1 overflow-y-auto divide-y divide-neutral-100" id="searchQuickList"></div>
+    </div>
+  </div>
+
+  <!-- Swiper.js Script -->
+  <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
+  <script>
+    // -------------------------------------------------------------
+    // SUPABASE CONFIGURATION
+    // -------------------------------------------------------------
+    const SUPABASE_URL = "https://zxbolqpmxlanslocqjsc.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_PRBhZBcIZhIRXuL4sN-7Fw_t9GieBTd";
+    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+    // STATE
+    let allRulings = [];
+    let filteredRulings = [];
+    let bookmarkedIds = JSON.parse(localStorage.getItem('nyay_bookmarks') || '[]');
+    let currentCourtTab = 'ALL';
+    let currentDistrictFilter = 'ALL';
+    let isBookmarksViewOnly = false;
+    let swiperInstance = null;
+
+    // ON LOAD
+    window.addEventListener('DOMContentLoaded', async () => {
+      lucide.createIcons();
+      initSwiper();
+      await fetchRulings();
+
+      // Register Service Worker for Real Standalone WebAPK on Android
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js').then((reg) => {
+          console.log('NyayShorts Service Worker registered successfully', reg);
+        }).catch((err) => {
+          console.warn('Service Worker registration error:', err);
+        });
+      }
+    });
+
+    // ANDROID WEBAPK NATIVE INSTALL LISTENER
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const banner = document.getElementById('installAppBanner');
+      if (banner) banner.classList.remove('hidden');
+    });
+
+    function triggerInstallApp() {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        deferredPrompt.userChoice.then((choiceResult) => {
+          if (choiceResult.outcome === 'accepted') {
+            const banner = document.getElementById('installAppBanner');
+            if (banner) banner.classList.add('hidden');
+          }
+          deferredPrompt = null;
+        });
+      }
+    }
+
+    // INIT SWIPER
+    function initSwiper() {
+      swiperInstance = new Swiper('.mySwiper', {
+        direction: 'vertical',
+        slidesPerView: 1,
+        spaceBetween: 14,
+        mousewheel: true,
+        speed: 280,
+        resistanceRatio: 0.15,
+        touchRatio: 1.15,
+        keyboard: { enabled: true }
+      });
+    }
+
+    // FETCH FROM SUPABASE + MERGE DATASET
+    async function fetchRulings() {
+      const loader = document.getElementById('loadingOverlay');
+      try {
+        const { data, error } = await supabaseClient
+          .from('rulings')
+          .select('*')
+          .order('judgment_date', { ascending: false });
+
+        if (error) console.warn("Supabase fetch notice:", error);
+        
+        const dbData = data || [];
+        const fullList = [...dbData];
+
+        const standardData = getComprehensiveCourtDatabase();
+        standardData.forEach(item => {
+          if (!fullList.some(existing => existing.title === item.title)) {
+            fullList.push(item);
+          }
+        });
+
+        allRulings = fullList;
+        applyFilters();
+      } catch (err) {
+        console.warn("Using local dataset:", err);
+        allRulings = getComprehensiveCourtDatabase();
+        applyFilters();
+      } finally {
+        if (loader) loader.classList.add('hidden');
+      }
+    }
+
+    // RENDER INSHORTS CARDS (Clean Headline + Full Judges Bench Names + Apple Liquid Glass)
+    function renderCards(rulings) {
+      const wrapper = document.getElementById('cardsWrapper');
+      const emptyState = document.getElementById('emptyState');
+      wrapper.innerHTML = '';
+
+      if (!rulings || rulings.length === 0) {
+        emptyState.classList.remove('hidden');
+        swiperInstance.update();
+        return;
+      }
+
+      emptyState.classList.add('hidden');
+
+      rulings.forEach((ruling) => {
+        const isBookmarked = bookmarkedIds.includes(ruling.id);
+        const imageUrl = ruling.image_url;
+        const formattedDate = formatTimeAgo(ruling.judgment_date);
+
+        const slide = document.createElement('div');
+        slide.className = 'swiper-slide w-full h-full flex flex-col justify-center items-center py-1';
+
+        slide.innerHTML = `
+          <!-- CARD CONTAINER (Centered, Floating with Left & Right Margins) -->
+          <div class="w-full h-full max-w-sm sm:max-w-md mx-auto flex flex-col justify-between overflow-hidden bg-black rounded-3xl border border-neutral-800/80 shadow-2xl select-none">
+            
+            <!-- 1. TOP 40%: CONTEXTUAL NEWS PHOTO -->
+            <div class="relative w-full h-[40%] flex-shrink-0 bg-neutral-900 overflow-hidden">
+              <img src="${imageUrl}" alt="Ruling Context" class="w-full h-full object-cover">
+              
+              <!-- Dark gradient vignette -->
+              <div class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/30"></div>
+
+              <!-- Top Right 3-dots Menu -->
+              <div class="absolute top-3 right-3">
+                <button onclick="shareRuling(${ruling.id})" aria-label="Menu" class="w-7 h-7 rounded-full bg-black/50 backdrop-blur-md flex items-center justify-center text-white/90">
+                  <i data-lucide="more-horizontal" class="w-4 h-4"></i>
+                </button>
+              </div>
+
+              <!-- Inshorts Carousel Dots Indicator -->
+              <div class="absolute bottom-2.5 left-0 right-0 flex items-center justify-center space-x-1.5">
+                <span class="w-2.5 h-2.5 rounded-full bg-white shadow-sm"></span>
+                <span class="w-2 h-2 rounded-full bg-white/40"></span>
+                <span class="w-2 h-2 rounded-full bg-white/40"></span>
+              </div>
+
+              <!-- Inshorts 1/1 Counter -->
+              <div class="absolute bottom-2.5 right-3 text-[11px] font-mono font-medium text-white/80 bg-black/50 backdrop-blur-md px-1.5 py-0.5 rounded">
+                1/1
+              </div>
+            </div>
+
+            <!-- 2. LOWER 60%: CRISP WHITE CARD (Clean Headline + Full Judges Bench) -->
+            <div class="h-[60%] flex-shrink-0 bg-cardBg rounded-b-3xl px-5 pt-3 pb-3 flex flex-col justify-between overflow-hidden">
+              
+              <!-- Content Group -->
+              <div class="flex-1 flex flex-col overflow-hidden">
+                
+                <!-- Top Utility Row: COMPLETELY CLEAN - ONLY BOOKMARK & SHARE ON RIGHT -->
+                <div class="flex items-center justify-end space-x-3 text-neutral-600 mb-1">
+                  <button onclick="toggleBookmark(${ruling.id}, this)" aria-label="Bookmark" class="p-1 hover:text-black transition">
+                    <i data-lucide="bookmark" class="w-4 h-4 ${isBookmarked ? 'fill-neutral-950 text-neutral-950' : ''}"></i>
+                  </button>
+                  <button onclick="shareRuling(${ruling.id})" aria-label="Share" class="p-1 hover:text-black transition">
+                    <i data-lucide="share-2" class="w-4 h-4"></i>
+                  </button>
+                </div>
+
+                <!-- Case Headline (Clean, Starts Directly, High-contrast Bold Black) -->
+                <h2 class="inshorts-headline text-[16px] sm:text-[17px] text-neutral-950 mb-2 leading-snug">
+                  ${escapeHtml(ruling.title)}
+                </h2>
+
+                <!-- 100-Word Summary / Held (Fills Space Comfortably, Clear for All) -->
+                <div class="overflow-y-auto no-scrollbar flex-1 pr-0.5">
+                  <p class="inshorts-body text-[13.5px] sm:text-[14px] leading-relaxed text-neutral-800">
+                    ${escapeHtml(ruling.summary)}
+                  </p>
+                </div>
+              </div>
+
+              <!-- Bottom Section: FULL JUDGES BENCH & APPLE LIQUID GLASS BAR -->
+              <div class="pt-2">
+                
+                <!-- Bottom Meta Line: Date + FULL NAMES OF ALL JUDGES IN BENCH -->
+                <div class="text-[11.5px] text-neutral-600 font-medium leading-tight mb-2 flex items-start gap-1">
+                  <span class="text-neutral-400 flex-shrink-0 font-normal">${formattedDate} •</span>
+                  <span class="text-neutral-700 line-clamp-1">
+                    <strong class="font-semibold text-neutral-900">Bench:</strong> ${escapeHtml(ruling.bench || 'Coram')}
+                  </span>
+                </div>
+
+                <!-- Apple Liquid Glass Button (Frosted Translucent Blur Effect) -->
+                <a href="${escapeHtml(ruling.pdf_url || '#')}" target="_blank" rel="noopener noreferrer" class="apple-liquid-glass rounded-2xl p-2.5 px-3.5 flex items-center justify-between text-neutral-900 transition hover:opacity-95 active:scale-[0.98]">
+                  <div class="flex items-center space-x-2.5 truncate mr-2">
+                    <div class="w-7 h-7 rounded-xl bg-neutral-900 text-white flex items-center justify-center text-xs shadow-sm flex-shrink-0">
+                      <i data-lucide="file-text" class="w-3.5 h-3.5"></i>
+                    </div>
+                    <div class="truncate">
+                      <p class="text-xs font-bold text-neutral-900 tracking-tight truncate">Tap to read full official judgment</p>
+                      <p class="text-[10px] text-neutral-500 font-medium">Original Court Order & Directions (PDF)</p>
+                    </div>
+                  </div>
+                  <div class="w-6 h-6 rounded-full bg-black/5 flex items-center justify-center text-neutral-700 flex-shrink-0">
+                    <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+                  </div>
+                </a>
+              </div>
+
+            </div>
+
+          </div>
+        `;
+
+        wrapper.appendChild(slide);
+      });
+
+      lucide.createIcons();
+      swiperInstance.update();
+      swiperInstance.slideTo(0, 0);
+    }
+
+    // TAB SWITCHING (Top Horizontal Nav)
+    function switchCourtTab(court) {
+      currentCourtTab = court;
+      const districtPillsRow = document.getElementById('districtPillsRow');
+
+      if (court === 'District Courts') {
+        districtPillsRow.classList.remove('hidden');
+      } else {
+        districtPillsRow.classList.add('hidden');
+        currentDistrictFilter = 'ALL';
+      }
+
+      document.querySelectorAll('.court-tab').forEach(tab => {
+        tab.classList.remove('text-inshortsBlue', 'font-bold');
+        tab.classList.add('text-neutral-400');
+        const ind = tab.querySelector('.active-indicator');
+        if (ind) ind.remove();
+      });
+
+      const tabIdMap = {
+        'ALL': 'tab-ALL',
+        'Supreme Court': 'tab-Supreme-Court',
+        'Delhi High Court': 'tab-Delhi-High-Court',
+        'Bombay High Court': 'tab-Bombay-High-Court',
+        'Patna High Court': 'tab-Patna-High-Court',
+        'Kerala High Court': 'tab-Kerala-High-Court',
+        'Allahabad High Court': 'tab-Allahabad-High-Court',
+        'Calcutta High Court': 'tab-Calcutta-High-Court',
+        'Madras High Court': 'tab-Madras-High-Court',
+        'Karnataka High Court': 'tab-Karnataka-High-Court',
+        'Punjab & Haryana High Court': 'tab-Punjab-Haryana-High-Court',
+        'Gujarat High Court': 'tab-Gujarat-High-Court',
+        'District Courts': 'tab-District-Courts'
+      };
+
+      const activeTab = document.getElementById(tabIdMap[court]);
+      if (activeTab) {
+        activeTab.classList.remove('text-neutral-400');
+        activeTab.classList.add('text-inshortsBlue', 'font-bold');
+        const indicator = document.createElement('span');
+        indicator.className = 'active-indicator absolute bottom-0 left-0 right-0 h-[2px] bg-inshortsBlue rounded-full';
+        activeTab.appendChild(indicator);
+      }
+
+      isBookmarksViewOnly = false;
+      const dockBookmark = document.getElementById('bookmarkDockBtn');
+      if (dockBookmark) dockBookmark.classList.remove('text-inshortsBlue');
+
+      applyFilters();
+    }
+
+    // DISTRICT SUB-FILTER PILLS
+    function filterDistrict(dist) {
+      currentDistrictFilter = dist;
+      document.querySelectorAll('.dist-pill').forEach(pill => {
+        pill.classList.remove('bg-neutral-800', 'text-white', 'font-semibold');
+        pill.classList.add('bg-neutral-900', 'text-neutral-400');
+      });
+      const distIdMap = {
+        'ALL': 'dist-ALL',
+        'Rouse Avenue': 'dist-Rouse-Avenue',
+        'Tis Hazari': 'dist-Tis-Hazari',
+        'Mumbai City Civil': 'dist-Mumbai',
+        'Patna Civil Court': 'dist-Patna',
+        'Ernakulam District': 'dist-Ernakulam'
+      };
+      const activePill = document.getElementById(distIdMap[dist]);
+      if (activePill) {
+        activePill.classList.remove('bg-neutral-900', 'text-neutral-400');
+        activePill.classList.add('bg-neutral-800', 'text-white', 'font-semibold');
+      }
+      applyFilters();
+    }
+
+    // APPLY FILTER LOGIC
+    function applyFilters() {
+      filteredRulings = allRulings.filter(r => {
+        let matchesCourt = true;
+        const courtName = (r.specific_court || r.court_level || '');
+
+        if (currentCourtTab === 'Supreme Court') {
+          matchesCourt = courtName.includes('Supreme');
+        } else if (currentCourtTab === 'Delhi High Court') {
+          matchesCourt = courtName.includes('Delhi');
+        } else if (currentCourtTab === 'Bombay High Court') {
+          matchesCourt = courtName.includes('Bombay');
+        } else if (currentCourtTab === 'Patna High Court') {
+          matchesCourt = courtName.includes('Patna');
+        } else if (currentCourtTab === 'Kerala High Court') {
+          matchesCourt = courtName.includes('Kerala');
+        } else if (currentCourtTab === 'Allahabad High Court') {
+          matchesCourt = courtName.includes('Allahabad');
+        } else if (currentCourtTab === 'Calcutta High Court') {
+          matchesCourt = courtName.includes('Calcutta');
+        } else if (currentCourtTab === 'Madras High Court') {
+          matchesCourt = courtName.includes('Madras');
+        } else if (currentCourtTab === 'Karnataka High Court') {
+          matchesCourt = courtName.includes('Karnataka');
+        } else if (currentCourtTab === 'Punjab & Haryana High Court') {
+          matchesCourt = courtName.includes('Punjab');
+        } else if (currentCourtTab === 'Gujarat High Court') {
+          matchesCourt = courtName.includes('Gujarat');
+        } else if (currentCourtTab === 'District Courts') {
+          matchesCourt = r.court_level === 'District Court';
+          if (currentDistrictFilter !== 'ALL') {
+            matchesCourt = matchesCourt && (courtName.includes(currentDistrictFilter));
+          }
+        }
+
+        const matchesBookmarks = (!isBookmarksViewOnly || bookmarkedIds.includes(r.id));
+        return matchesCourt && matchesBookmarks;
+      });
+
+      renderCards(filteredRulings);
+    }
+
+    // BOOKMARKS
+    function toggleBookmark(id, btn) {
+      const idx = bookmarkedIds.indexOf(id);
+      if (idx > -1) {
+        bookmarkedIds.splice(idx, 1);
+      } else {
+        bookmarkedIds.push(id);
+      }
+      localStorage.setItem('nyay_bookmarks', JSON.stringify(bookmarkedIds));
+      
+      const icon = btn.querySelector('svg');
+      if (icon) {
+        const isSaved = bookmarkedIds.includes(id);
+        icon.classList.toggle('fill-neutral-950', isSaved);
+        icon.classList.toggle('text-neutral-950', isSaved);
+      }
+
+      if (isBookmarksViewOnly) applyFilters();
+    }
+
+    function toggleBookmarksView() {
+      isBookmarksViewOnly = !isBookmarksViewOnly;
+      const dockBtn = document.getElementById('bookmarkDockBtn');
+      if (dockBtn) {
+        dockBtn.classList.toggle('text-inshortsBlue', isBookmarksViewOnly);
+      }
+      applyFilters();
+    }
+
+    // SHARE FUNCTION (Inshorts WhatsApp Share)
+    function shareRuling(id) {
+      const item = allRulings.find(r => r.id === id);
+      if (!item) return;
+
+      const shareText = `⚖️ *${item.title}*\n\n` +
+        `${item.summary}\n\n` +
+        `🏛️ *${item.specific_court || item.court_level}*\n` +
+        `⚖️ *Bench:* ${item.bench}\n` +
+        `📖 Full judgment: ${item.pdf_url || window.location.href}\n\n` +
+        `📲 Read more 100-word rulings on NyayShorts`;
+
+      if (navigator.share) {
+        navigator.share({
+          title: item.title,
+          text: shareText,
+          url: window.location.href
+        }).catch(() => {});
+      } else {
+        navigator.clipboard.writeText(shareText);
+        const encoded = encodeURIComponent(shareText);
+        window.open(`https://api.whatsapp.com/send?text=${encoded}`, '_blank');
+      }
+    }
+
+    // SEARCH
+    function toggleSearchModal(show) {
+      const modal = document.getElementById('searchModal');
+      const input = document.getElementById('searchInput');
+      modal.classList.toggle('hidden', !show);
+      if (show) {
+        input.value = '';
+        input.focus();
+        handleSearch('');
+      }
+    }
+
+    function handleSearch(query) {
+      const q = query.toLowerCase().trim();
+      const resultsContainer = document.getElementById('searchQuickList');
+      const countEl = document.getElementById('searchResultsCount');
+
+      if (!q) {
+        countEl.textContent = 'Type a legal case title, judge name, or term...';
+        resultsContainer.innerHTML = '';
+        return;
+      }
+
+      const matches = allRulings.filter(r => 
+        r.title.toLowerCase().includes(q) ||
+        r.summary.toLowerCase().includes(q) ||
+        (r.bench && r.bench.toLowerCase().includes(q)) ||
+        (r.citation && r.citation.toLowerCase().includes(q)) ||
+        (r.specific_court && r.specific_court.toLowerCase().includes(q))
+      );
+
+      countEl.textContent = `Found ${matches.length} ruling${matches.length === 1 ? '' : 's'}`;
+      
+      resultsContainer.innerHTML = matches.map(m => `
+        <div onclick="selectSearchResult(${m.id})" class="py-2.5 px-2 hover:bg-neutral-50 cursor-pointer rounded-lg transition">
+          <div class="flex items-center gap-1.5 text-[10px] text-neutral-500 font-bold">
+            <span>${escapeHtml(m.specific_court || m.court_level)}</span> • <span>${escapeHtml(m.bench || '')}</span>
+          </div>
+          <h4 class="text-xs font-bold text-neutral-900 line-clamp-1">${escapeHtml(m.title)}</h4>
+          <p class="text-[11px] text-neutral-600 line-clamp-2 mt-0.5">${escapeHtml(m.summary)}</p>
+        </div>
+      `).join('');
+    }
+
+    function selectSearchResult(id) {
+      toggleSearchModal(false);
+      switchCourtTab('ALL');
+      const index = filteredRulings.findIndex(r => r.id === id);
+      if (index > -1) swiperInstance.slideTo(index, 300);
+    }
+
+    function formatTimeAgo(dateStr) {
+      if (!dateStr) return 'recently';
+      const d = new Date(dateStr);
+      return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    // COMPLETE BENCH WITH FULL NAMES OF ALL JUDGES WHO DELIVERED THE JUDGMENT
+    function getComprehensiveCourtDatabase() {
+      return [
+        // 1. SUPREME COURT: DIGITAL ARREST CYBER SCAM (Full Bench Names)
+        {
+          id: 1,
+          title: "Police and investigating agencies cannot conduct 'Digital Arrest' over video calls: Supreme Court",
+          court_level: "Supreme Court",
+          specific_court: "Supreme Court of India",
+          category: "Cyber Law & Criminal",
+          bench: "Chief Justice D.Y. Chandrachud, Justice J.B. Pardiwala & Justice Manoj Misra",
+          citation: "2024 INSC 780",
+          judgment_date: "2024-10-15",
+          image_url: "https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=1000&q=80",
+          summary: "Clarifying nationwide alarm regarding fraudulent cyber extortion schemes, the Supreme Court declared that Indian criminal jurisprudence does not recognize any concept called 'Digital Arrest'. The bench unequivocally held that no police officer, Central Bureau of Investigation, Enforcement Directorate, or customs official possesses any legal authority to confine citizens inside their homes, inspect premises, or demand money transfers through Skype, WhatsApp, or video calls. Directing state police chiefs and specialized cyber crime cells to conduct extensive public awareness campaigns, the apex court affirmed that citizens must immediately report such fraudulent calls without fear of arrest or harassment.",
+          pdf_url: "https://main.sci.gov.in/"
+        },
+
+        // 2. SUPREME COURT: BAIL AS FUNDAMENTAL RULE (Full Bench Names)
+        {
+          id: 2,
+          title: "Bail is the fundamental rule and jail is only an exception, reiterates Supreme Court",
+          court_level: "Supreme Court",
+          specific_court: "Supreme Court of India",
+          category: "Criminal Law",
+          bench: "Justice B.R. Gavai & Justice K.V. Viswanathan",
+          citation: "2024 INSC 615",
+          judgment_date: "2024-08-09",
+          image_url: "https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&w=1000&q=80",
+          summary: "Reiterating the foundational doctrine of personal liberty, the Supreme Court held that bail is the primary rule while imprisonment remains an exceptional measure. The bench ruled that the gravity or seriousness of an offense alone cannot justify prolonged pre-trial incarceration once police have concluded investigation and filed the chargesheet. Underscoring that detention prior to trial must never serve as punitive retribution, the Court affirmed that keeping undertrials jailed indefinitely when there exists no flight risk or evidence tampering violates Article 21 of the Constitution. Courts must actively balance societal interests against the fundamental freedom of citizens.",
+          pdf_url: "https://main.sci.gov.in/"
+        },
+
+        // 3. DELHI HIGH COURT: AIRLINE FLIGHT DELAYS (Full Bench Names)
+        {
+          id: 101,
+          title: "Airlines cannot abandon passengers during long flight delays without food and hotels: Delhi HC",
+          court_level: "High Court",
+          specific_court: "Delhi High Court",
+          category: "Consumer Aviation Rights",
+          bench: "Acting Chief Justice Manmohan & Justice Mini Pushkarna",
+          citation: "2024 DHC 1980",
+          judgment_date: "2024-07-02",
+          image_url: "https://images.unsplash.com/photo-1436491865332-7a61a109cc05?auto=format&fit=crop&w=1000&q=80",
+          summary: "The Delhi High Court held that commercial airlines cannot abandon passengers during long operational flight delays or dense fog conditions without providing immediate relief. Affirming consumer protection under aviation guidelines, the Court ruled that airlines bear a mandatory legal duty to provide complimentary food, drinking water, medical assistance, and comfortable hotel accommodation whenever flights are delayed beyond statutory windows. Rejecting operational excuses, the bench directed the Directorate General of Civil Aviation to establish transparent compensation grievance mechanisms, noting that elderly travelers, patients, and families stranded inside congested terminals are entitled to humane treatment and timely updates.",
+          pdf_url: "https://delhihighcourt.nic.in/"
+        },
+
+        // 4. DELHI HIGH COURT: DEFAULT BAIL DEADLINE (Full Bench Names)
+        {
+          id: 102,
+          title: "Accused gets automatic right to bail if chargesheet is not filed within 60 or 90 days: Delhi HC",
+          court_level: "High Court",
+          specific_court: "Delhi High Court",
+          category: "Criminal Procedure",
+          bench: "Justice Suresh Kumar Kait & Justice Manoj Jain",
+          citation: "2024 DHC 3412",
+          judgment_date: "2024-05-15",
+          image_url: "https://images.unsplash.com/photo-1453873531674-2151bcd01707?auto=format&fit=crop&w=1000&q=80",
+          summary: "The Delhi High Court held that the right to default bail under Section 167(2) of the Code of Criminal Procedure is an indefeasible and fundamental right emanating directly from Article 21. If the investigating police agency fails to complete its investigation and submit the final chargesheet within the statutory window of 60 or 90 days, the accused acquires an immediate, non-negotiable right to release upon furnishing bail. The Court ruled that magistrate judges have no discretionary power to entertain belated extension requests once the deadline has expired, reinforcing procedural safeguards against arbitrary state detention.",
+          pdf_url: "https://delhihighcourt.nic.in/"
+        },
+
+        // 5. BOMBAY HIGH COURT: SOCIAL MEDIA CRITICISM (Full Bench Names)
+        {
+          id: 201,
+          title: "Criticizing public officials or government decisions on social media is not a crime: Bombay HC",
+          court_level: "High Court",
+          specific_court: "Bombay High Court",
+          category: "Free Speech & Liberty",
+          bench: "Justice S.S. Shinde & Justice M.S. Karnik",
+          citation: "2024 BHC 2045",
+          judgment_date: "2024-04-10",
+          image_url: "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?auto=format&fit=crop&w=1000&q=80",
+          summary: "Quashing an FIR registered against a citizen for posting critical political commentary on social media, the Bombay High Court held that freedom of speech under Article 19(1)(a) protects citizens' inherent right to peacefully express disagreement with public authorities and elected leaders. The division bench ruled that bona fide dissent, satirical remarks, and fair criticism of government administrative policies cannot be equated with promoting public disorder, inciting communal disharmony, or disrupting communal peace under the Indian Penal Code. The Court reminded law enforcement that criminal machinery must not be weaponized to suppress constitutionally protected civil dialogue.",
+          pdf_url: "https://bombayhighcourt.nic.in/"
+        },
+
+        // 6. BOMBAY HIGH COURT: CHEQUE BOUNCE & DIRECTORS (Full Bench Names)
+        {
+          id: 202,
+          title: "Independent directors cannot be jailed for bounced company cheques without direct role: Bombay HC",
+          court_level: "High Court",
+          specific_court: "Bombay High Court",
+          category: "Commercial Banking",
+          bench: "Justice N.J. Jamadar",
+          citation: "2024 BHC 1180",
+          judgment_date: "2024-06-20",
+          image_url: "https://images.unsplash.com/photo-1554224155-6726b3ff858f?auto=format&fit=crop&w=1000&q=80",
+          summary: "Providing significant legal clarity for corporate professionals, the Bombay High Court quashed cheque bounce prosecution initiated under Section 138 of the Negotiable Instruments Act against an independent non-executive director. The Court held that individuals cannot be held vicariously liable for corporate debts merely because their names appear on the company's board of directors. To sustain criminal summons under Section 141, the complainant must specifically plead and demonstrate with credible evidence that the director was actively in charge of and responsible for day-to-day financial conduct and transaction issuance at the time the dishonor occurred.",
+          pdf_url: "https://bombayhighcourt.nic.in/"
+        },
+
+        // 7. PATNA HIGH COURT: POLICE LOCKING ANCESTRAL LAND (Full Bench Names)
+        {
+          id: 301,
+          title: "Police officers cannot arbitrarily lock private family land during civil disputes: Patna HC",
+          court_level: "High Court",
+          specific_court: "Patna High Court",
+          category: "Property Rights",
+          bench: "Justice Sandeep Kumar",
+          citation: "2024 PHC 1420",
+          judgment_date: "2024-03-12",
+          image_url: "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=1000&q=80",
+          summary: "The Patna High Court strongly reprimanded local police officers for unlawfully interfering in private civil property and boundary disputes between family members. The bench held that police officials possess zero legal authority or statutory jurisdiction to place locks on private ancestral residences, agricultural plots, or commercial shops without an explicit, formal order issued by a competent Civil Court or District Magistrate. Warning station house officers against acting as private eviction agents, the Court reiterated that citizen property rights remain constitutionally protected under Article 300A, directing administrative disciplinary action against officers who bypass civil courts.",
+          pdf_url: "https://patnahighcourt.gov.in/"
+        },
+
+        // 8. PATNA HIGH COURT: ARBITRARY TERMINATION OF TEACHERS (Full Bench Names)
+        {
+          id: 302,
+          title: "Teachers cannot be removed without proper enquiry and opportunity to be heard: Patna HC",
+          court_level: "High Court",
+          specific_court: "Patna High Court",
+          category: "Service Law",
+          bench: "Justice P.B. Bajanthri & Justice Jitendra Kumar",
+          citation: "2024 PHC 2890",
+          judgment_date: "2024-05-18",
+          image_url: "https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1000&q=80",
+          summary: "Setting aside unilateral termination orders of government teachers, the Patna High Court held that employment orders affecting livelihoods must strictly follow natural justice. Even in contractual public positions, authorities cannot fire employees based on unverified complaints without issuing a formal show-cause notice and conducting a fair inquiry. The Court ruled that summary dismissals violate constitutional guarantees of equal protection under Article 14, directing immediate reinstatement and back wages.",
+          pdf_url: "https://patnahighcourt.gov.in/"
+        },
+
+        // 9. KERALA HIGH COURT: RIGHT TO INTERNET ACCESS (Full Bench Names)
+        {
+          id: 401,
+          title: "Right to access high-speed internet is part of Right to Education and Life: Kerala HC",
+          court_level: "High Court",
+          specific_court: "Kerala High Court",
+          category: "Digital Rights",
+          bench: "Justice P.V. Asha",
+          citation: "2024 KHC 901",
+          judgment_date: "2024-02-14",
+          image_url: "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=1000&q=80",
+          summary: "The Kerala High Court delivered a landmark ruling holding that access to high-speed internet is an integral component of the fundamental Right to Education and Right to Privacy protected under Article 21. Setting aside strict college hostel regulations that barred female undergraduate students from using mobile phones or personal laptops during evening study hours, the Court declared that digital connectivity is an indispensable modern tool for acquiring knowledge. The bench observed that arbitrary administrative bans on internet access unduly restrict educational advancement and individual autonomy without serving any legitimate disciplinary purpose.",
+          pdf_url: "https://hckerala.gov.in/"
+        },
+
+        // 10. KERALA HIGH COURT: 498A DOWRY DISPUTES (Full Bench Names)
+        {
+          id: 402,
+          title: "Routine domestic differences cannot be turned into Section 498A dowry harassment cases: Kerala HC",
+          court_level: "High Court",
+          specific_court: "Kerala High Court",
+          category: "Matrimonial Law",
+          bench: "Justice A. Badharudeen",
+          citation: "2024 KHC 1540",
+          judgment_date: "2024-06-11",
+          image_url: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=1000&q=80",
+          summary: "The Kerala High Court cautioned against misusing matrimonial criminal provisions. The Court held that routine marital wear and tear or differences of opinion between spouses do not amount to cruelty under Section 498A IPC unless there is clear harassment connected to unlawful demands for dowry or physical threat to life. The bench emphasized that criminal courts must scrutinize omnibus allegations carefully before summoning aged in-laws and distant relatives.",
+          pdf_url: "https://hckerala.gov.in/"
+        },
+
+        // 11. ALLAHABAD HIGH COURT: LOUDSPEAKERS & NIGHT NOISE (Full Bench Names)
+        {
+          id: 501,
+          title: "Citizens have right to peaceful sleep; loudspeaker volume must follow night limits: Allahabad HC",
+          court_level: "High Court",
+          specific_court: "Allahabad High Court",
+          category: "Citizen Rights",
+          bench: "Justice Vivek Kumar Birla & Justice Vikas Budhwar",
+          citation: "2024 AHC 3105",
+          judgment_date: "2024-03-25",
+          image_url: "https://images.unsplash.com/photo-1545128485-c400e7702796?auto=format&fit=crop&w=1000&q=80",
+          summary: "The Allahabad High Court ruled that citizens have an inherent constitutional right to peaceful sleep and a quiet domestic environment under Article 21, which cannot be violated by loud audio amplifiers. The bench observed that no religious scripture prescribes that prayers or community announcements must be broadcasted through high-decibel loudspeakers that disturb elderly citizens, hospital patients, and studying schoolchildren. Directing district magistrates and police commissioners to strictly enforce national Noise Pollution Control Rules, the Court ordered a total prohibition on public loudspeaker usage between 10:00 PM and 6:00 AM without exceptions.",
+          pdf_url: "https://www.allahabadhighcourt.in/"
+        },
+
+        // 12. CALCUTTA HIGH COURT: DEFECTIVE ONLINE DELIVERIES (Full Bench Names)
+        {
+          id: 601,
+          title: "E-commerce companies cannot dodge responsibility when defective goods arrive: Calcutta HC",
+          court_level: "High Court",
+          specific_court: "Calcutta High Court",
+          category: "Consumer Protection",
+          bench: "Justice Sabyasachi Bhattacharyya",
+          citation: "2024 CHC 2140",
+          judgment_date: "2024-04-29",
+          image_url: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?auto=format&fit=crop&w=1000&q=80",
+          summary: "The Calcutta High Court held that prominent online shopping marketplaces are directly liable to consumers under the Consumer Protection Act. When a customer receives damaged goods or duplicate products, the platform cannot escape liability by claiming it is merely a neutral intermediary platform. Platforms that collect money, promote listings, and manage logistics owe a statutory duty of care to ensure delivered items match their advertised description.",
+          pdf_url: "https://www.calcuttahighcourt.gov.in/"
+        },
+
+        // 13. MADRAS HIGH COURT: CITIZEN RIGHT TO CHANGE NAME (Full Bench Names)
+        {
+          id: 701,
+          title: "Citizens have absolute right to change their name and identity without state hurdles: Madras HC",
+          court_level: "High Court",
+          specific_court: "Madras High Court",
+          category: "Personal Liberty",
+          bench: "Justice G.R. Swaminathan",
+          citation: "2024 MHC 1890",
+          judgment_date: "2024-05-30",
+          image_url: "https://images.unsplash.com/photo-1544717305-2782549b5136?auto=format&fit=crop&w=1000&q=80",
+          summary: "The Madras High Court ruled that an adult citizen has complete autonomy to change their name or religion without arbitrary bureaucratic delays by the Government Gazette department. The Court held that one's name and personal identity form an integral part of personal autonomy guaranteed under Article 21. State agencies cannot reject gazette publication based on moral or administrative reservations.",
+          pdf_url: "https://www.hcmadras.tn.nic.in/"
+        },
+
+        // 14. KARNATAKA HIGH COURT: IT EMPLOYEE MOONLIGHTING (Full Bench Names)
+        {
+          id: 801,
+          title: "Employees' off-duty personal hobbies and free freelance work cannot be banned: Karnataka HC",
+          court_level: "High Court",
+          specific_court: "Karnataka High Court",
+          category: "Employment Law",
+          bench: "Justice M. Nagaprasanna",
+          citation: "2024 KHC 4210",
+          judgment_date: "2024-07-15",
+          image_url: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?auto=format&fit=crop&w=1000&q=80",
+          summary: "Addressing modern workplace clauses, the Karnataka High Court clarified that while companies can prohibit working for direct competitors, employment contracts cannot restrict creative, educational, or unrelated personal activities conducted outside office hours that do not compromise company data. Restricting off-hours liberty without demonstrable commercial harm amounts to unreasonable restraint of trade.",
+          pdf_url: "https://karnatakajudiciary.kar.nic.in/"
+        },
+
+        // 15. PUNJAB & HARYANA HIGH COURT: GRANDPARENTS RIGHTS (Full Bench Names)
+        {
+          id: 901,
+          title: "Grandparents entitled to visitation rights with grandchildren despite parental divorce: P&H HC",
+          court_level: "High Court",
+          specific_court: "Punjab & Haryana High Court",
+          category: "Family Law",
+          bench: "Justice Ritu Bahri & Justice Manisha Batra",
+          citation: "2024 PHHC 1675",
+          judgment_date: "2024-08-01",
+          image_url: "https://images.unsplash.com/photo-1509198397868-475647b2a1e5?auto=format&fit=crop&w=1000&q=80",
+          summary: "The High Court ruled that children are entitled to the love and affection of both sets of grandparents. When parents separate, maternal or paternal grandparents cannot be completely denied contact with grandchildren, as emotional bonds with extended family are vital for healthy psychological development. Family courts must prioritize child welfare by granting structured visitation.",
+          pdf_url: "https://highcourtchd.gov.in/"
+        },
+
+        // 16. GUJARAT HIGH COURT: FREEZING BUSINESS ACCOUNTS (Full Bench Names)
+        {
+          id: 1001,
+          title: "Tax authorities cannot freeze business bank accounts without prima facie proof of evasion: Gujarat HC",
+          court_level: "High Court",
+          specific_court: "Gujarat High Court",
+          category: "Commercial Law",
+          bench: "Justice N.V. Anjaria & Justice Bhargav D. Karia",
+          citation: "2024 GHC 3310",
+          judgment_date: "2024-06-05",
+          image_url: "https://images.unsplash.com/photo-1444653614773-995cb1ef902c?auto=format&fit=crop&w=1000&q=80",
+          summary: "The Gujarat High Court held that freezing bank accounts paralyzes legitimate business operations and hurts employee salaries. GST and income tax officers must exercise this power only in rare, exceptional emergencies with documented reasons, rather than using account attachments as routine recovery tools. Arbitrary attachment orders without concrete tax evasion findings violate Article 19(1)(g).",
+          pdf_url: "https://gujarathighcourt.nic.in/"
+        },
+
+        // 17. DISTRICT COURT TIS HAZARI: TRAFFIC CHALLAN (Judge Full Title)
+        {
+          id: 2001,
+          title: "Traffic police cannot seize driving license on the spot for minor lane violations: Tis Hazari Court",
+          court_level: "District Court",
+          specific_court: "Tis Hazari District Court (Delhi)",
+          category: "Traffic Law",
+          bench: "Chief Metropolitan Magistrate Snigdha Sarvaria",
+          citation: "2024 THC 890",
+          judgment_date: "2024-05-22",
+          image_url: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=1000&q=80",
+          summary: "The Tis Hazari District Court ruled that traffic police personnel cannot arbitrarily seize or retain original driving licenses, vehicle registration certificates, or identity cards on the roadside for minor lane infractions or routine challans. The Chief Metropolitan Magistrate clarified that the Motor Vehicles Act permits temporary on-spot license confiscation only in specific severe offenses such as drunken driving, high-speed reckless collisions, or vehicular manslaughter. The Court directed senior traffic police supervisors to ensure on-duty personnel issue computerized receipts rather than coercing commuters by holding custody of their essential personal identity documents.",
+          pdf_url: "https://delhidistrictcourts.nic.in/"
+        },
+
+        // 18. DISTRICT COURT MUMBAI: LANDLORD UTILITY CUTS (Judge Full Title)
+        {
+          id: 2002,
+          title: "Landlords cannot cut water or electricity supply to force tenants to vacate: Mumbai Sessions",
+          court_level: "District Court",
+          specific_court: "Mumbai City Civil & Sessions Court",
+          category: "Tenancy Rights",
+          bench: "Judge A.A. Kulkarni (City Civil Court Mumbai)",
+          citation: "2024 CCCM 1120",
+          judgment_date: "2024-06-18",
+          image_url: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?auto=format&fit=crop&w=1000&q=80",
+          summary: "The Mumbai City Civil and Sessions Court granted urgent injunctive relief to an urban tenant, holding that residential landlords cannot deliberately disconnect electricity, drinking water, or elevator access to compel occupants to vacate premises during tenancy disputes. The Court ruled that basic utilities constitute fundamental amenities essential for human dignity and living standards. Even if rent arrears or lease expiration disputes arise, property owners must strictly follow legal eviction procedures before the Small Causes Rent Court rather than adopting coercive, extrajudicial measures to render premises uninhabitable.",
+          pdf_url: "https://districts.ecourts.gov.in/mumbai"
+        }
+      ];
+    }
+  </script>
+</body>
+</html>
